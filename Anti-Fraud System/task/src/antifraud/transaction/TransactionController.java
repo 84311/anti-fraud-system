@@ -1,18 +1,20 @@
-package antifraud;
+package antifraud.transaction;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/antifraud")
 public class TransactionController {
 
-    @PostMapping("/api/antifraud/transaction")
+    @PostMapping("/transaction")
     public ResponseEntity<Map<String, String>> settleTransaction(@RequestBody Map<String, Long> amountJSON) {
         long amount = amountJSON.get("amount") == null ? -1 : amountJSON.get("amount");
         String result;
