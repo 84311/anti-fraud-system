@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/api/auth")
 public class AuthorizationController {
     private final PasswordEncoder encoder;
 
@@ -25,7 +26,7 @@ public class AuthorizationController {
         this.encoder = encoder;
     }
 
-    @PostMapping("/api/auth/user")
+    @PostMapping("/user")
     public ResponseEntity<User> register(@RequestBody UserDTO userDTO) {
         if (userDTO.name == null || userDTO.username == null || userDTO.password == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -35,11 +36,17 @@ public class AuthorizationController {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
 
+        String role = userRepository.findAll().isEmpty()
+                ? Role.ADMINISTRATOR.asStringWithRolePrefix : Role.MERCHANT.asStringWithRolePrefix;
+
+        boolean isAccountNonLocked = userRepository.findAll().isEmpty();
+
         User newUser = new User(
                 userDTO.name,
                 userDTO.username,
                 encoder.encode(userDTO.password),
-                "user"
+                role,
+                isAccountNonLocked
         );
 
         userRepository.save(newUser);
@@ -49,12 +56,12 @@ public class AuthorizationController {
                 .body(newUser);
     }
 
-    @GetMapping("/api/auth/list")
-    public List<User> register() {
+    @GetMapping("/list")
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    @DeleteMapping("/api/auth/user/{username}")
+    @DeleteMapping("/user/{username}")
     public Map<String, String> deleteUser(@PathVariable String username) {
         Optional<User> userToDelete = userRepository.findByUsernameIgnoreCase(username);
 
@@ -68,6 +75,52 @@ public class AuthorizationController {
                 "status", "Deleted successfully!",
                 "username", username
         );
+    }
+
+    @PutMapping("/role")
+    public User updateRole(@RequestBody Map<String, String> usernameAndRole) {
+        String username = usernameAndRole.get("username");
+        String role = usernameAndRole.get("role");
+
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!Role.valuesAsStrings().contains(role) || role.equals("ADMINISTRATOR")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if (user.getRoleWithoutPrefix().equals(role)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+
+        user.setRole("ROLE_" + role);
+        userRepository.save(user);
+        return user;
+    }
+
+    @PutMapping("/access")
+    public Map<String, String> toggleUserLock(@RequestBody Map<String, String> usernameAndLockValue) {
+        String username = usernameAndLockValue.get("username");
+        String operation = usernameAndLockValue.get("operation");
+
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (user.getRole().equals("ROLE_ADMINISTRATOR")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if (operation.equals("LOCK")) {
+            user.setAccountNonLocked(false);
+            userRepository.save(user);
+            return Map.of("status", "User " + user.getUsername() + " locked!");
+        } else if (operation.equals("UNLOCK")) {
+            user.setAccountNonLocked(true);
+            userRepository.save(user);
+            return Map.of("status", "User " + user.getUsername() + " unlocked!");
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 }
 

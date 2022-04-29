@@ -39,8 +39,10 @@ public class WebSecurityConfigurerImpl extends WebSecurityConfigurerAdapter {
                 .csrf().disable().headers().frameOptions().disable() // for Postman, H2 console
                 .and()
                 .authorizeRequests()
-                .mvcMatchers("/api/auth/user").permitAll()
-                .antMatchers("/actuator/shutdown").permitAll() // for testing
+                .mvcMatchers("/api/auth/user", "/actuator/shutdown").permitAll()
+                .mvcMatchers("/api/antifraud/transaction").hasRole("MERCHANT")
+                .mvcMatchers("/api/auth/list").hasAnyRole("SUPPORT", "ADMINISTRATOR")
+                .mvcMatchers("/api/auth/**").hasRole("ADMINISTRATOR")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

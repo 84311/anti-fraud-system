@@ -11,11 +11,13 @@ public class UserDetailsImpl implements UserDetails {
     private final String username;
     private final String password;
     private final List<GrantedAuthority> rolesAndAuthorities;
+    private final boolean accountNotLocked;
 
     public UserDetailsImpl(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.rolesAndAuthorities = List.of(new SimpleGrantedAuthority(user.getRole()));
+        this.accountNotLocked = user.isAccountNonLocked();
     }
 
     @Override
@@ -40,7 +42,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return this.accountNotLocked;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package antifraud.authentication;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
@@ -32,18 +33,28 @@ public class User {
     private String password;
 
     @Column
-    @JsonIgnore
     @NotNull
+    @JsonIgnore
     private String role;
+
+    @Column
+    @JsonIgnore
+    private boolean accountNonLocked;
 
     public User() {
     }
 
-    public User(String name, String username, String password, String role) {
+    public User(String name, String username, String password, String role, boolean isAccountNonLocked) {
         this.name = name;
         this.username = username;
         this.password = password;
         this.role = role;
+        this.accountNonLocked = isAccountNonLocked;
+    }
+
+    @JsonProperty("role")
+    public String getRoleWithoutPrefix() {
+        return role.substring(5);
     }
 
     @Override
