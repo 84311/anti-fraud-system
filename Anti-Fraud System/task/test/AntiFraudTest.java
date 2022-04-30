@@ -137,86 +137,106 @@ public class AntiFraudTest extends SpringTest {
             "  \"username\" : \"johndoe2\",\n" +
             "  \"role\" : \"SUPPORT\"\n" +
             "} ]";
+    List<Integer> userIdList = new ArrayList<>();
+
     private final String tr2 = "{\n" +
             "  \"amount\": 199,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String tr3 = "{\n" +
             "  \"amount\": 200,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String tr4 = "{\n" +
             "  \"amount\": 201,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String tr5 = "{\n" +
             "  \"amount\": 1499,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String tr6 = "{\n" +
             "  \"amount\": 1500,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String tr7 = "{\n" +
             "  \"amount\": 1501,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String tr8 = "{\n" +
             "  \"amount\": 2000,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String trW1 = "{\n" +
             "  \"amount\": -1,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String trW2 = "{\n" +
             "  \"amount\": 0,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String trW3 = "{\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String trW4 = "{\n" +
             "  \"amount\": \" \",\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String trW5 = "{\n" +
             "  \"amount\": \"\",\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String trW6 = "{ }";
+
     private final String trP1 = "{\n" +
             "  \"amount\": 1000,\n" +
             "  \"ip\": \"192.168.1.67\",\n" +
             "  \"number\": \"4000008449433403\"\n" +
             "}";
+
     private final String trP2 = "{\n" +
             "  \"amount\": 1000,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
             "  \"number\": \"4000003305160034\"\n" +
             "}";
+
     private final String trP3 = "{\n" +
             "  \"amount\": 1000,\n" +
             "  \"ip\": \"192.168.1.67\",\n" +
             "  \"number\": \"4000003305160034\"\n" +
             "}";
+
     private final String trP4 = "{\n" +
             "  \"amount\": 2000,\n" +
             "  \"ip\": \"192.168.1.67\",\n" +
             "  \"number\": \"4000003305160034\"\n" +
             "}";
+
+
     private final String ipAnswer = "[ {\n" +
             "  \"id\" : 1,\n" +
             "  \"ip\" : \"192.168.1.66\"\n" +
@@ -224,12 +244,16 @@ public class AntiFraudTest extends SpringTest {
             "  \"id\" : 2,\n" +
             "  \"ip\" : \"192.168.1.67\"\n" +
             "} ]";
+
     private final String ipAnswer2 = "[ {\n" +
             "  \"id\" : 2,\n" +
             "  \"ip\" : \"192.168.1.67\"\n" +
             "} ]";
+
     private final String ipAnswerEmpty = "[]";
+
     private final String cardAnswerEmpty = "[]";
+
     private final String cardAnswer = "[ {\n" +
             "  \"id\" : 1,\n" +
             "  \"number\" : \"4000003305061034\"\n" +
@@ -237,17 +261,16 @@ public class AntiFraudTest extends SpringTest {
             "  \"id\" : 2,\n" +
             "  \"number\" : \"4000003305160034\"\n" +
             "} ]";
+
     private final String cardAnswer2 = "[ {\n" +
             "  \"id\" : 2,\n" +
             "  \"number\" : \"4000003305160034\"\n" +
             "} ]";
-    List<Integer> userIdList = new ArrayList<>();
 
 
     public AntiFraudTest() {
         super(AntiFraudApplication.class, "../service_db.mv.db");
     }
-
     @DynamicTest
     DynamicTesting[] dt = new DynamicTesting[]{
             // Test POST request for signup api

@@ -43,6 +43,7 @@ public class WebSecurityConfigurerImpl extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/api/antifraud/transaction").hasRole("MERCHANT")
                 .mvcMatchers("/api/auth/list").hasAnyRole("SUPPORT", "ADMINISTRATOR")
                 .mvcMatchers("/api/auth/**").hasRole("ADMINISTRATOR")
+                .mvcMatchers("/api/antifraud/suspicious-ip/**", "api/antifraud/stolencard/**").hasRole("SUPPORT")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
