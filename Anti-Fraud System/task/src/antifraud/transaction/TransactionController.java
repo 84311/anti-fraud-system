@@ -1,8 +1,7 @@
 package antifraud.transaction;
 
-import antifraud.stolencardsandsuspiciousips.StolenCardRepository;
-import antifraud.stolencardsandsuspiciousips.SuspiciousIPRepository;
-import lombok.Data;
+import antifraud.stolencard.StolenCardRepository;
+import antifraud.suspiciousip.SuspiciousIPRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +13,7 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/antifraud")
+@RequestMapping("/api/antifraud/transaction")
 public class TransactionController {
 
     @Resource
@@ -23,47 +22,22 @@ public class TransactionController {
     @Resource
     StolenCardRepository stolenCardRepository;
 
-    @PostMapping("/transaction")
-    public Map<String, String> settleTransaction(@RequestBody TransactionDTO transaction) {
-        long amount = transaction.amount;
-        String ip = transaction.ip;
-        String cardNumber = transaction.number;
+    @Resource
+    TransactionRepository transactionRepository;
 
-        if (amount <= 0 || ip.isEmpty() || cardNumber.isEmpty()) {
+    @PostMapping
+    public Map<String, String> settleTransaction(@RequestBody TransactionEntity transaction) {
+        if (transaction.amount <= 0 || transaction.ip.isEmpty() || transaction.number.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        String result;
-        String info = "";
-        boolean suspiciousIp = suspiciousIPRepository.findByIp(ip).isPresent();
-        boolean stolenCard = stolenCardRepository.findByNumber(cardNumber).isPresent();
-        boolean tooMuch = amount > 1500;
+        transactionRepository.save(transaction);
 
-        if (suspiciousIp || stolenCard || tooMuch) {
-            result = TransactionResult.PROHIBITED.name();
-            info += tooMuch ? "amount, " : "";
-            info += stolenCard ? "card-number, " : "";
-            info += suspiciousIp ? "ip" : "";
-        } else if (amount > 200) {
-            result = TransactionResult.MANUAL_PROCESSING.name();
-            info += "amount";
-        } else {
-            result = TransactionResult.ALLOWED.name();
-            info = "none";
-        }
+        TransactionValidator.verifyTransaction(transaction, this);
 
-        info = info.trim();
-        info = info.endsWith(",") ? info.substring(0, info.length() - 1) : info;
         return Map.of(
-                "result", result,
-                "info", info
+                "result", transaction.result.name(),
+                "info", transaction.info
         );
-    }
-
-    @Data
-    private static class TransactionDTO {
-        long amount;
-        String ip;
-        String number;
     }
 }

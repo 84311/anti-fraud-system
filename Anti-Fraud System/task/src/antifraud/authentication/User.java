@@ -11,33 +11,28 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity(name = "user")
+@Table(name = "user")
 @Getter
 @Setter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column
     private Long id;
 
-    @Column
     @NotNull
     private String name;
 
-    @Column
     @NotNull
     private String username;
 
-    @Column
     @JsonIgnore
     @NotNull
     private String password;
 
-    @Column
     @NotNull
     @JsonIgnore
     private String role;
 
-    @Column
     @JsonIgnore
     private boolean accountNonLocked;
 

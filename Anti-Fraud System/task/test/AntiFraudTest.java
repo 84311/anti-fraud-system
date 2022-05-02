@@ -111,7 +111,9 @@ public class AntiFraudTest extends SpringTest {
     private final String tr1 = "{\n" +
             "  \"amount\": 1,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
 
     private final String listAnswer2 = "[ {\n" +
@@ -137,104 +139,205 @@ public class AntiFraudTest extends SpringTest {
             "  \"username\" : \"johndoe2\",\n" +
             "  \"role\" : \"SUPPORT\"\n" +
             "} ]";
-    List<Integer> userIdList = new ArrayList<>();
-
     private final String tr2 = "{\n" +
             "  \"amount\": 199,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:01:00\"\n" +
             "}";
-
     private final String tr3 = "{\n" +
             "  \"amount\": 200,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:02:00\"\n" +
             "}";
-
     private final String tr4 = "{\n" +
             "  \"amount\": 201,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:03:00\"\n" +
             "}";
-
     private final String tr5 = "{\n" +
             "  \"amount\": 1499,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:04:00\"\n" +
             "}";
-
     private final String tr6 = "{\n" +
             "  \"amount\": 1500,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:05:00\"\n" +
             "}";
-
     private final String tr7 = "{\n" +
             "  \"amount\": 1501,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:06:00\"\n" +
             "}";
-
     private final String tr8 = "{\n" +
             "  \"amount\": 2000,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:07:00\"\n" +
             "}";
-
     private final String trW1 = "{\n" +
             "  \"amount\": -1,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
-
     private final String trW2 = "{\n" +
             "  \"amount\": 0,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
-
     private final String trW3 = "{\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
-
     private final String trW4 = "{\n" +
             "  \"amount\": \" \",\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
-
     private final String trW5 = "{\n" +
             "  \"amount\": \"\",\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
-
-    private final String trW6 = "{ }";
-
     private final String trP1 = "{\n" +
             "  \"amount\": 1000,\n" +
             "  \"ip\": \"192.168.1.67\",\n" +
-            "  \"number\": \"4000008449433403\"\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
 
+    private final String trW6 = "{ }";
     private final String trP2 = "{\n" +
             "  \"amount\": 1000,\n" +
             "  \"ip\": \"192.168.1.1\",\n" +
-            "  \"number\": \"4000003305160034\"\n" +
+            "  \"number\": \"4000003305160034\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
-
     private final String trP3 = "{\n" +
             "  \"amount\": 1000,\n" +
             "  \"ip\": \"192.168.1.67\",\n" +
-            "  \"number\": \"4000003305160034\"\n" +
+            "  \"number\": \"4000003305160034\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
-
     private final String trP4 = "{\n" +
             "  \"amount\": 2000,\n" +
             "  \"ip\": \"192.168.1.67\",\n" +
-            "  \"number\": \"4000003305160034\"\n" +
+            "  \"number\": \"4000003305160034\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T16:00:00\"\n" +
             "}";
+    // correlation rules
+    private final String corr1IP = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.2\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T17:10:00\"\n" +
+            "}";
+    private final String corr2IP = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.3\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T17:11:00\"\n" +
+            "}";
+    private final String corr22IP = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.3\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T17:12:00\"\n" +
+            "}";
+    private final String corr3IP = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.4\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T17:12:00\"\n" +
+            "}";
+    private final String corr4IP = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.5\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T17:13:00\"\n" +
+            "}";
+    private final String corr5IP = "{\n" +
+            "  \"amount\": 2000,\n" +
+            "  \"ip\": \"192.168.1.5\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-22T17:14:00\"\n" +
+            "}";
+    private final String corr1Reg = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.2\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"EAP\",\n" +
+            "  \"date\": \"2022-01-21T17:10:00\"\n" +
+            "}";
+    private final String corr2Reg = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.2\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"ECA\",\n" +
+            "  \"date\": \"2022-01-21T17:11:00\"\n" +
+            "}";
+    private final String corr22Reg = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.2\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"ECA\",\n" +
+            "  \"date\": \"2022-01-21T17:12:00\"\n" +
+            "}";
+    private final String corr3Reg = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.2\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"HIC\",\n" +
+            "  \"date\": \"2022-01-21T17:13:00\"\n" +
+            "}";
+    private final String corr4Reg = "{\n" +
+            "  \"amount\": 1,\n" +
+            "  \"ip\": \"192.168.1.2\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"SSA\",\n" +
+            "  \"date\": \"2022-01-21T17:14:00\"\n" +
+            "}";
+    private final String corr5Reg = "{\n" +
+            "  \"amount\": 2000,\n" +
+            "  \"ip\": \"192.168.1.2\",\n" +
+            "  \"number\": \"4000008449433403\",\n" +
+            "  \"region\": \"SA\",\n" +
+            "  \"date\": \"2022-01-21T17:15:00\"\n" +
+            "}";
+    List<Integer> userIdList = new ArrayList<>();
 
 
     private final String ipAnswer = "[ {\n" +
@@ -660,6 +763,87 @@ public class AntiFraudTest extends SpringTest {
                     new TestHint(transactionApi, "", "Transaction must be PROHIBITED" +
                             " due to - amount, stolen card, suspicious ip reasons")), // 94
 
+            // Test correlation rules
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr1IP,
+                    "ALLOWED", "none",
+                    new TestHint(transactionApi, "", "Transaction must be ALLOWED")), // 95
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr2IP,
+                    "ALLOWED", "none",
+                    new TestHint(transactionApi, "", "Transaction must be ALLOWED")), // 96
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr22IP,
+                    "ALLOWED", "none",
+                    new TestHint(transactionApi, "", "Transaction must be ALLOWED")), // 97
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr3IP,
+                    "MANUAL_PROCESSING", "ip-correlation",
+                    new TestHint(transactionApi, "", "Transaction must be MANUAL_PROCESSING" +
+                            " due to - ip correlation rule")), // 98
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr4IP,
+                    "PROHIBITED", "ip-correlation",
+                    new TestHint(transactionApi, "", "Transaction must be PROHIBITED" +
+                            " due to - ip correlation rule")), // 99 Thnx to E. Kovko
+
+            () -> testAddCard(johndoe2, 200, "4000008449433403",
+                    new TestHint(cardApi, "", "A card must be added to Black List")), // 100
+
+            () -> testAddIP(johndoe2, 200, "192.168.1.5",
+                    new TestHint(ipApi, "", "IP must be added to Black List")), // 101
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr5IP,
+                    "PROHIBITED", "amount, card-number, ip, ip-correlation",
+                    new TestHint(transactionApi, "", "Transaction must be PROHIBITED" +
+                            " due to - amount, card-number, ip, ip-correlation reasons")), // 102
+            //
+            () -> testDeleteCard(johndoe2, 200, "4000008449433403",
+                    new TestHint(cardApi, "", "Card must be removed from Black List")), // 103
+
+            () -> testDeleteIP(johndoe2, 200, "192.168.1.5",
+                    new TestHint(ipApi, "", "IP must be removed from Black List")), // 104
+
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr1Reg,
+                    "ALLOWED", "none",
+                    new TestHint(transactionApi, "", "Transaction must be ALLOWED")), // 105
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr2Reg,
+                    "ALLOWED", "none",
+                    new TestHint(transactionApi, "", "Transaction must be ALLOWED")), // 106
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr22Reg,
+                    "ALLOWED", "none",
+                    new TestHint(transactionApi, "", "Transaction must be ALLOWED")), // 107
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr3Reg,
+                    "MANUAL_PROCESSING", "region-correlation",
+                    new TestHint(transactionApi, "", "Transaction must be MANUAL_PROCESSING" +
+                            " due to - region correlation rule")), // 108
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr4Reg,
+                    "PROHIBITED", "region-correlation",
+                    new TestHint(transactionApi, "", "Transaction must be PROHIBITED" +
+                            " due to - region correlation rule")), // 109
+
+            () -> testAddCard(johndoe2, 200, "4000008449433403",
+                    new TestHint(cardApi, "", "A card must be added to Black List")), // 110
+
+            () -> testAddIP(johndoe2, 200, "192.168.1.2",
+                    new TestHint(ipApi, "", "IP must be added to Black List")), // 111
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr5Reg,
+                    "PROHIBITED", "amount, card-number, ip, region-correlation",
+                    new TestHint(transactionApi, "", "Transaction must be PROHIBITED" +
+                            " due to - amount, card-number, ip, region-correlation reasons")), // 112
+
+            () -> testDeleteCard(johndoe2, 200, "4000008449433403",
+                    new TestHint(cardApi, "", "Card must be removed from Black List")), // 113
+
+            () -> testTransaction(johndoe3, transactionApi, "POST", 200, corr3IP,
+                    "MANUAL_PROCESSING", "ip-correlation",
+                    new TestHint(transactionApi, "", "Transaction must be MANUAL_PROCESSING" +
+                            " due to - ip correlation rule")), // 114
 
     };
 
@@ -693,6 +877,7 @@ public class AntiFraudTest extends SpringTest {
         System.out.println(hint.toString());
 
         HttpResponse response = checkResponseStatus(null, body, status, userApi, "POST");
+
 
         if (response.getStatusCode() == 201) {
 
