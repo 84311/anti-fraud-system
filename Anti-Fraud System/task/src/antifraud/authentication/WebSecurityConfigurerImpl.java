@@ -2,6 +2,7 @@ package antifraud.authentication;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,8 +15,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 
 @EnableWebSecurity
 public class WebSecurityConfigurerImpl extends WebSecurityConfigurerAdapter {
-    AuthenticationEntryPoint restAuthenticationEntryPoint;
-    UserDetailsService userDetailsService;
+    private final AuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final UserDetailsService userDetailsService;
 
     @Autowired
     public WebSecurityConfigurerImpl(AuthenticationEntryPoint restAuthenticationEntryPoint,
@@ -40,10 +41,10 @@ public class WebSecurityConfigurerImpl extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .mvcMatchers("/api/auth/user", "/actuator/shutdown").permitAll()
-                .mvcMatchers("/api/antifraud/transaction").hasRole("MERCHANT")
+                .mvcMatchers(HttpMethod.POST, "/api/antifraud/transaction").hasRole("MERCHANT")
                 .mvcMatchers("/api/auth/list").hasAnyRole("SUPPORT", "ADMINISTRATOR")
                 .mvcMatchers("/api/auth/**").hasRole("ADMINISTRATOR")
-                .mvcMatchers("/api/antifraud/suspicious-ip/**", "api/antifraud/stolencard/**").hasRole("SUPPORT")
+                .mvcMatchers("/api/antifraud/**").hasRole("SUPPORT")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

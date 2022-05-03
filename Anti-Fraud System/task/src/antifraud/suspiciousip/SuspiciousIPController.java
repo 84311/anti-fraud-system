@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class SuspiciousIPController {
 
     @Resource
-    SuspiciousIPRepository suspiciousIPRepository;
+    private SuspiciousIPRepository suspiciousIPRepository;
 
     @PostMapping
     public SuspiciousIPEntity saveIP(@Valid @RequestBody Map<String, String> ipJSON) {

@@ -19,7 +19,7 @@ public class AuthorizationController {
     private final PasswordEncoder encoder;
 
     @Resource
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     public AuthorizationController(PasswordEncoder encoder) {

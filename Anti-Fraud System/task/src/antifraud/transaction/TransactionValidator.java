@@ -1,42 +1,59 @@
 package antifraud.transaction;
 
-import antifraud.stolencard.StolenCardRepository;
+import antifraud.card.CardEntity;
+import antifraud.card.CardRepository;
 import antifraud.suspiciousip.SuspiciousIPRepository;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import javax.annotation.Resource;
+import java.util.*;
 
+@Component
 public class TransactionValidator {
-    private final TransactionEntity transaction;
-    private final SuspiciousIPRepository suspiciousIPRepository;
-    private final StolenCardRepository stolenCardRepository;
-    private final TransactionRepository transactionRepository;
+    private TransactionEntity transaction;
+    @Resource
+    private SuspiciousIPRepository suspiciousIPRepository;
+    @Resource
+    private CardRepository cardRepository;
+    @Resource
+    private TransactionRepository transactionRepository;
 
-    private final Set<String> info = new TreeSet<>();
+    private Set<String> info;
 
-    private TransactionValidator(TransactionEntity transaction,
-                                 SuspiciousIPRepository suspiciousIPRepository,
-                                 StolenCardRepository stolenCardRepository,
-                                 TransactionRepository transactionRepository) {
+    public static boolean isCardNumberNonValid(String number) {
+        int nDigits = number.length();
+
+        int nSum = 0;
+        boolean isSecond = false;
+        for (int i = nDigits - 1; i >= 0; i--) {
+            int d = number.charAt(i) - '0';
+
+            if (isSecond) {
+                d = d * 2;
+            }
+
+            nSum += d / 10;
+            nSum += d % 10;
+            isSecond = !isSecond;
+        }
+        return (nSum % 10 != 0);
+    }
+
+    public static boolean isFeedbackFormatWrong(String feedback) {
+        return Arrays.stream(TransactionResult.values())
+                .noneMatch(r -> r.name().equals(feedback));
+    }
+
+    private void checkIfSuspiciousIP() {
+        if (suspiciousIPRepository.findByIp(transaction.ip).isPresent()) {
+            transaction.result = TransactionResult.PROHIBITED;
+            info.add("ip");
+        }
+    }
+
+    public void verifyTransaction(TransactionEntity transaction) {
         this.transaction = transaction;
-        this.suspiciousIPRepository = suspiciousIPRepository;
-        this.stolenCardRepository = stolenCardRepository;
-        this.transactionRepository = transactionRepository;
-    }
-
-    public static void verifyTransaction(TransactionEntity transaction, TransactionController controller) {
-
-        TransactionValidator transactionValidator = new TransactionValidator(
-                transaction,
-                controller.suspiciousIPRepository,
-                controller.stolenCardRepository,
-                controller.transactionRepository);
-
-        transactionValidator.verifyTransaction();
-    }
-
-    private void verifyTransaction() {
+        this.info = new TreeSet<>();
         transaction.result = TransactionResult.ALLOWED;
 
         checkIfStolenCard();
@@ -48,60 +65,9 @@ public class TransactionValidator {
     }
 
     private void checkIfStolenCard() {
-        if (stolenCardRepository.findByNumber(transaction.number).isPresent()) {
+        if (cardRepository.existsByNumberAndLockedTrue(transaction.number)) {
             transaction.result = TransactionResult.PROHIBITED;
             info.add("card-number");
-        }
-    }
-
-    private void checkIfSuspiciousIP() {
-        if (suspiciousIPRepository.findByIp(transaction.ip).isPresent()) {
-            transaction.result = TransactionResult.PROHIBITED;
-            info.add("ip");
-        }
-    }
-
-    private void checkIfCorrelation() {
-        List<TransactionEntity> oneHourBeforeTransaction =
-                transactionRepository.findAllByDateBetweenAndNumber(
-                        transaction.date.minusHours(1), transaction.date, transaction.number);
-
-        long regionCount = oneHourBeforeTransaction.stream().map(TransactionEntity::getRegion).distinct().count();
-        long ipCount = oneHourBeforeTransaction.stream().map(TransactionEntity::getIp).distinct().count();
-
-        if (regionCount == 3 && transaction.result != TransactionResult.PROHIBITED) {
-            transaction.result = TransactionResult.MANUAL_PROCESSING;
-            info.add("region-correlation");
-        }
-
-        if (ipCount == 3 && transaction.result != TransactionResult.PROHIBITED) {
-            transaction.result = TransactionResult.MANUAL_PROCESSING;
-            info.add("ip-correlation");
-        }
-
-        if (regionCount > 3) {
-            transaction.result = TransactionResult.PROHIBITED;
-            info.add("region-correlation");
-        }
-
-        if (ipCount > 3) {
-            transaction.result = TransactionResult.PROHIBITED;
-            info.add("ip-correlation");
-        }
-    }
-
-    private void checkIfTooMuchMoney() {
-        if (transaction.amount > 200 && transaction.amount <= 1500 && transaction.result != TransactionResult.PROHIBITED) {
-            transaction.result = TransactionResult.MANUAL_PROCESSING;
-            info.add("amount");
-        }
-
-        if (transaction.amount > 1500) {
-            if (transaction.result != TransactionResult.PROHIBITED) {
-                info.clear();
-            }
-            info.add("amount");
-            transaction.result = TransactionResult.PROHIBITED;
         }
     }
 
@@ -111,5 +77,64 @@ public class TransactionValidator {
         }
 
         return String.join(", ", info);
+    }
+
+    private void checkIfCorrelation() {
+        List<TransactionEntity> oneHourBeforeTransaction =
+                transactionRepository.findAllByDateBetweenAndNumber(
+                        transaction.date.minusHours(1), transaction.date, transaction.number);
+
+        long regionCount = oneHourBeforeTransaction.stream()
+                .map(TransactionEntity::getRegion)
+                .filter(r -> r != transaction.region)
+                .distinct().count();
+
+        long ipCount = oneHourBeforeTransaction.stream()
+                .map(TransactionEntity::getIp)
+                .filter(ip -> !Objects.equals(ip, transaction.ip))
+                .distinct().count();
+
+        if (regionCount == 2 && transaction.result != TransactionResult.PROHIBITED) {
+            transaction.result = TransactionResult.MANUAL_PROCESSING;
+            info.add("region-correlation");
+        }
+
+        if (ipCount == 2 && transaction.result != TransactionResult.PROHIBITED) {
+            transaction.result = TransactionResult.MANUAL_PROCESSING;
+            info.add("ip-correlation");
+        }
+
+        if (regionCount > 2) {
+            transaction.result = TransactionResult.PROHIBITED;
+            info.add("region-correlation");
+        }
+
+        if (ipCount > 2) {
+            transaction.result = TransactionResult.PROHIBITED;
+            info.add("ip-correlation");
+        }
+    }
+
+    private void checkIfTooMuchMoney() {
+        CardEntity card = cardRepository.findByNumber(transaction.number)
+                .orElseThrow(AssertionError::new);
+
+        int allowedLimit = card.getAllowedLimit();
+        int manualLimit = card.getManualLimit();
+
+        if (transaction.amount > allowedLimit && transaction.amount <= manualLimit
+                && transaction.result != TransactionResult.PROHIBITED) {
+
+            transaction.result = TransactionResult.MANUAL_PROCESSING;
+            info.add("amount");
+        }
+
+        if (transaction.amount > manualLimit) {
+            if (transaction.result != TransactionResult.PROHIBITED) {
+                info.clear();
+            }
+            info.add("amount");
+            transaction.result = TransactionResult.PROHIBITED;
+        }
     }
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
-@Entity
+@Entity(name = "suspicious_ip")
 @Table(name = "suspicious_ip")
 @Getter
 @Setter
@@ -21,7 +21,7 @@ public class SuspiciousIPEntity {
     @NotEmpty
     private String ip;
 
-    public SuspiciousIPEntity(String ip) {
+    SuspiciousIPEntity(String ip) {
         this.ip = ip;
     }
 }
